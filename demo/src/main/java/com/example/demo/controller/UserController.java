@@ -1,15 +1,48 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.User;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.example.demo.service.UserService;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/user")
 public class UserController {
-    @GetMapping("/user")
-    public User getUser(){
-        return new User("Shashank","shashanksingh@email.com");
+    private final UserService userService;
+
+    public UserController(UserService userService){
+        this.userService=userService;
     }
+
+    // CREATE
+    @PostMapping
+    public User createUser(@RequestBody User user){
+        return userService.createUser(user);
+    }
+
+    // READ ALL
+    @GetMapping
+    public List<User> getAllUsers(){
+        return userService.getAllUser();
+    }
+
+    // READ BY ID
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable Long id){
+        return userService.getUserById(id);
+    }
+
+    // UPDATE
+    @PutMapping("/{id}")
+    public User updateUser(@PathVariable Long id, @RequestBody User user){
+        return userService.updateUser(id,user);
+    }
+
+    // DELETE
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable Long id){
+        userService.deleteUser(id);
+    }
+
 }
