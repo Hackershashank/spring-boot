@@ -2,6 +2,7 @@
 package com.example.demo.service;
 import java.util.*;
 
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.Admin;
 import com.example.demo.repository.AdminRepository;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class AdminService {
 
     public Admin getUserById(Long id){
         return adminRepository.findById(id).
-                orElseThrow(()->new RuntimeException("Admin not found"));
+                orElseThrow(()->new ResourceNotFoundException("Admin not found with id: "+id));
     }
 
     public Admin updateUser(Long id,Admin updatedUser){

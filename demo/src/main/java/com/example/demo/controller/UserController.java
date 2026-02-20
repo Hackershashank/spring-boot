@@ -2,6 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,32 +20,37 @@ public class UserController {
 
     // CREATE
     @PostMapping
-    public User createUser(@RequestBody User user){
-        return userService.createUser(user);
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user){
+        User saved=userService.createUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     // READ ALL
     @GetMapping
-    public List<User> getAllUsers(){
-        return userService.getAllUser();
+    public ResponseEntity<List<User>> getAllUsers(){
+        List<User> users=userService.getAllUser();
+        return ResponseEntity.ok(users);
     }
 
     // READ BY ID
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id){
-        return userService.getUserById(id);
+    public ResponseEntity<User> getUserById(@PathVariable Long id){
+        User user=userService.getUserById(id);
+        return ResponseEntity.ok(user);
     }
 
     // UPDATE
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user){
-        return userService.updateUser(id,user);
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user){
+        User updated=userService.updateUser(id,user);
+        return ResponseEntity.ok(updated);
     }
 
     // DELETE
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id){
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id){
         userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
