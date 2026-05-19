@@ -39,6 +39,14 @@ public class Admin {
     private LocalDateTime createdAt=LocalDateTime.now();
 
     // Default constructor for JPA
+    // Used by JPA so that Jackson (Java object conversion)
+    // Serialization (Java object-> JSON)
+    // Deserialization (JSON-> Java Object)
+    // Overall it converts JSON (user input) to below code
+    // Admin admin=new Admin();
+    // admin.setName("Shashank");
+    // admin.setEmail("shashank14370@gmail.com")
+    // Similarly, Spring uses Jackson serializes while returning response in JSON
     public Admin(){}
 
     // Parameterized constructor

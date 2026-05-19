@@ -9,8 +9,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AdminService {
+
+    // Dependency Injection
     private final AdminRepository adminRepository;
 
+    // Constructor Injection
     public AdminService(AdminRepository adminRepository){
         this.adminRepository=adminRepository;
     }
@@ -23,6 +26,7 @@ public class AdminService {
         return adminRepository.findAll();
     }
 
+    // getUserById returns 'Optional' data structure to avoid NullPointerException in case null is there
     public Admin getUserById(Long id){
         return adminRepository.findById(id).
                 orElseThrow(()->new ResourceNotFoundException("Admin not found with id: "+id));

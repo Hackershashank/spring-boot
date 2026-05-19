@@ -19,6 +19,8 @@ public class UserController {
     }
 
     // CREATE
+
+    // RequestBody converts JSON (user input) to java Objects
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User user){
         User saved=userService.createUser(user);
@@ -33,6 +35,7 @@ public class UserController {
     }
 
     // READ BY ID
+    // PathVariable is used when some variable is needed to be passed from url to methods
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id){
         User user=userService.getUserById(id);
@@ -52,5 +55,4 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
-
 }
