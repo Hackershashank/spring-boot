@@ -1,6 +1,10 @@
 package com.example.demo.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.example.demo.dto.AdminRequestDTO;
+import com.example.demo.dto.AdminResponseDTO;
 import com.example.demo.model.Admin;
 import com.example.demo.service.AdminService;
 import jakarta.validation.Valid;
@@ -18,37 +22,68 @@ public class AdminController {
 
     // CREATE
     @PostMapping
-    public ResponseEntity<Admin> createAdmin(@Valid @RequestBody Admin admin){
+    public ResponseEntity<AdminResponseDTO> createAdmin(@Valid @RequestBody AdminRequestDTO dto){
+        // DTO -> Entity conversion
+        Admin admin=new Admin(dto.getName(),dto.getEmail());
         Admin saved=adminService.createAdmin(admin);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+
+        // Entity -> DTO conversion
+        AdminResponseDTO response=new AdminResponseDTO(
+                saved.getId(),
+                saved.getName(),
+                saved.getEmail(),
+                saved.getCreatedAt()
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // READ ALL
     @GetMapping
-    public ResponseEntity<List<Admin>> getAllAdmins(){
-        List<Admin> admins=adminService.getAllUser();
+    public ResponseEntity<List<AdminResponseDTO>> getAllAdmins(){
+        List<AdminResponseDTO> admins=adminService.getAllAdmins()
+                .stream()
+                .map(admin->new AdminResponseDTO(
+                        admin.getId(),
+                        admin.getName(),
+                        admin.getEmail(),
+                        admin.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
         return ResponseEntity.ok(admins);
     }
 
     // READ BY ID
     @GetMapping("/{id}")
-    public ResponseEntity<Admin> getAdminById(@PathVariable Long id){
-        Admin admin=adminService.getUserById(id);
-        return ResponseEntity.ok(admin);
+    public ResponseEntity<AdminResponseDTO> getAdminById(@PathVariable Long id){
+        Admin admin=adminService.getAdminById(id);
+        AdminResponseDTO response=new AdminResponseDTO(
+                admin.getId(),
+                admin.getName(),
+                admin.getEmail(),
+                admin.getCreatedAt()
+        );
+        return ResponseEntity.ok(response);
     }
 
     // UPDATE
     @PutMapping("/{id}")
-    public ResponseEntity<Admin> updateAdmin(@PathVariable Long id,
-                             @RequestBody Admin admin){
-        Admin updated=adminService.updateUser(id,admin);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<AdminResponseDTO> updateAdmin(@PathVariable Long id,
+                             @Valid @RequestBody AdminRequestDTO dto){
+        Admin updatedAdmin=new Admin(dto.getName(),dto.getEmail());
+        Admin updated=adminService.updateAdmin(id,updatedAdmin);
+        AdminResponseDTO response=new AdminResponseDTO(
+                updated.getId(),
+                updated.getName(),
+                updated.getEmail(),
+                updated.getCreatedAt()
+        );
+        return ResponseEntity.ok(response);
     }
 
     // DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAdmin(@PathVariable Long id){
-        adminService.deleteUser(id);
+        adminService.deleteAdmin(id);
         return ResponseEntity.noContent().build();
     }
 }

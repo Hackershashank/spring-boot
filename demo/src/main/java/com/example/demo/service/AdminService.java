@@ -22,24 +22,25 @@ public class AdminService {
         return adminRepository.save(admin);
     }
 
-    public List<Admin> getAllUser(){
+    public List<Admin> getAllAdmins(){
         return adminRepository.findAll();
     }
 
     // getUserById returns 'Optional' data structure to avoid NullPointerException in case null is there
-    public Admin getUserById(Long id){
+    public Admin getAdminById(Long id){
         return adminRepository.findById(id).
                 orElseThrow(()->new ResourceNotFoundException("Admin not found with id: "+id));
     }
 
-    public Admin updateUser(Long id,Admin updatedUser){
-        Admin user=getUserById(id);
-        user.setName(updatedUser.getName());
-        user.setEmail(updatedUser.getEmail());
-        return adminRepository.save(user);
+    public Admin updateAdmin(Long id,Admin updatedAdmin){
+        Admin existingAdmin=getAdminById(id);
+        existingAdmin.setName(updatedAdmin.getName());
+        existingAdmin.setEmail(updatedAdmin.getEmail());
+        return adminRepository.save(existingAdmin);
     }
 
-    public void deleteUser(Long id){
-        adminRepository.deleteById(id);
+    public void deleteAdmin(Long id){
+        Admin admin=getAdminById(id);
+        adminRepository.delete(admin);
     }
 }
