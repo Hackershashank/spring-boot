@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import com.example.demo.dto.AdminRequestDTO;
 import com.example.demo.dto.AdminResponseDTO;
+import com.example.demo.mapper.AdminMapper;
 import com.example.demo.model.Admin;
 import com.example.demo.service.AdminService;
 import jakarta.validation.Valid;
@@ -16,52 +17,41 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/admin")
 public class AdminController {
     private final AdminService adminService;
-    public AdminController(AdminService adminService){
+    private final AdminMapper adminMapper;
+    public AdminController(AdminService adminService, AdminMapper adminMapper){
+
         this.adminService=adminService;
+        this.adminMapper=adminMapper;
     }
 
     // CREATE
     @PostMapping
     public ResponseEntity<AdminResponseDTO> createAdmin(@Valid @RequestBody AdminRequestDTO dto){
-        // DTO -> Entity conversion
-        Admin admin=new Admin(dto.getName(),dto.getEmail());
+        // RequestDTO -> Entity
+        Admin admin=adminMapper.toEntity(dto);
+
+        // save entity
         Admin saved=adminService.createAdmin(admin);
 
-        // Entity -> DTO conversion
-        AdminResponseDTO response=new AdminResponseDTO(
-                saved.getId(),
-                saved.getName(),
-                saved.getEmail(),
-                saved.getCreatedAt()
-        );
+        // Entity -> ResponseDTO
+        AdminResponseDTO response=adminMapper.toResponseDTO(saved);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // READ ALL
     @GetMapping
     public ResponseEntity<List<AdminResponseDTO>> getAllAdmins(){
-        List<AdminResponseDTO> admins=adminService.getAllAdmins()
-                .stream()
-                .map(admin->new AdminResponseDTO(
-                        admin.getId(),
-                        admin.getName(),
-                        admin.getEmail(),
-                        admin.getCreatedAt()
-                ))
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(admins);
+        List<Admin> admins=adminService.getAllAdmins();
+        List<AdminResponseDTO> response=adminMapper.toResponseDTOList(admins);
+        return ResponseEntity.ok(response);
     }
 
     // READ BY ID
     @GetMapping("/{id}")
     public ResponseEntity<AdminResponseDTO> getAdminById(@PathVariable Long id){
         Admin admin=adminService.getAdminById(id);
-        AdminResponseDTO response=new AdminResponseDTO(
-                admin.getId(),
-                admin.getName(),
-                admin.getEmail(),
-                admin.getCreatedAt()
-        );
+        AdminResponseDTO response=adminMapper.toResponseDTO(admin);
         return ResponseEntity.ok(response);
     }
 
@@ -69,14 +59,9 @@ public class AdminController {
     @PutMapping("/{id}")
     public ResponseEntity<AdminResponseDTO> updateAdmin(@PathVariable Long id,
                              @Valid @RequestBody AdminRequestDTO dto){
-        Admin updatedAdmin=new Admin(dto.getName(),dto.getEmail());
+        Admin updatedAdmin=adminMapper.toEntity(dto);
         Admin updated=adminService.updateAdmin(id,updatedAdmin);
-        AdminResponseDTO response=new AdminResponseDTO(
-                updated.getId(),
-                updated.getName(),
-                updated.getEmail(),
-                updated.getCreatedAt()
-        );
+        AdminResponseDTO response=adminMapper.toResponseDTO(updated);
         return ResponseEntity.ok(response);
     }
 

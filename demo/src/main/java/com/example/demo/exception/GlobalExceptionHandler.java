@@ -37,11 +37,11 @@ public class GlobalExceptionHandler {
                                 error.getDefaultMessage()
                         )
                 );
-        ApiError apiError=new ApiError(
+        ApiError error=new ApiError(
                 HttpStatus.BAD_REQUEST.value(),
                 errors
         );
-        return new ResponseEntity<>(apiError,HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(error,HttpStatus.BAD_REQUEST);
     }
 
     //Generic Exception
@@ -53,5 +53,4 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error,HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
 }

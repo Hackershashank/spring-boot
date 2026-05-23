@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.UserRequestDTO;
 import com.example.demo.dto.UserResponseDTO;
+import com.example.demo.mapper.UserMapper;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
 import jakarta.validation.Valid;
@@ -16,9 +17,12 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
+    private final UserMapper userMapper;
 
-    public UserController(UserService userService){
+    public UserController(UserService userService, UserMapper userMapper){
+
         this.userService=userService;
+        this.userMapper=userMapper;
     }
 
     // CREATE
@@ -26,32 +30,18 @@ public class UserController {
     // RequestBody converts JSON (user input) to java Objects
     @PostMapping
     public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRequestDTO dto){
-        User user=new User(dto.getName(),dto.getEmail());
+        User user=userMapper.toEntity(dto);
         User saved=userService.createUser(user);
-
-        UserResponseDTO response=new UserResponseDTO(
-                saved.getId(),
-                saved.getName(),
-                saved.getEmail(),
-                saved.getCreatedAt()
-        );
-
+        UserResponseDTO response=userMapper.toResponseDTO(saved);
         return ResponseEntity.ok(response);
     }
 
     // READ ALL
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAllUsers(){
-        List<UserResponseDTO> users=userService.getAllUsers()
-                .stream()
-                .map(user->new UserResponseDTO(
-                        user.getId(),
-                        user.getName(),
-                        user.getEmail(),
-                        user.getCreatedAt()
-                ))
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(users);
+        List<User> users=userService.getAllUsers();
+        List<UserResponseDTO> response=userMapper.toResponseDTOList(users);
+        return ResponseEntity.ok(response);
     }
 
     // READ BY ID
@@ -59,26 +49,16 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id){
         User user=userService.getUserById(id);
-        UserResponseDTO response=new UserResponseDTO(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getCreatedAt()
-        );
+        UserResponseDTO response=userMapper.toResponseDTO(user);
         return ResponseEntity.ok(response);
     }
 
     // UPDATE
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UserRequestDTO dto){
-        User updateUser=new User(dto.getName(),dto.getEmail());
+        User updateUser=userMapper.toEntity(dto);
         User updated=userService.updateUser(id,updateUser);
-        UserResponseDTO response=new UserResponseDTO(
-                updated.getId(),
-                updated.getName(),
-                updated.getEmail(),
-                updated.getCreatedAt()
-        );
+        UserResponseDTO response=userMapper.toResponseDTO(updated);
         return ResponseEntity.ok(response);
     }
 
