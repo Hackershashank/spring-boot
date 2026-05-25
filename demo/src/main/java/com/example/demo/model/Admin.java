@@ -31,6 +31,13 @@ public class Admin {
     @Column(updatable=false)
     private LocalDateTime createdAt=LocalDateTime.now();
 
+    // Join Column containing model is the owning side because
+    // Hibernate only updates foreign key from owning side.
+    @ManyToMany
+    // Create foreign key column
+    @JoinColumn(name="department_id")
+    private Department department;
+
     // Default constructor for JPA
     // Used by JPA so that Jackson (Java object conversion)
     // Serialization (Java object-> JSON)
